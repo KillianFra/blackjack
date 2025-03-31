@@ -8,8 +8,8 @@ export function getNewDeck(deckCount: number = 6) : Promise<getDeckProps> {
         .then(response => response.json())
 }
 
-export function drawCard(number: number) : Promise<getCardsProps> {
-    return fetch(`${apiUrl}/<<deck_id>>/draw/?count=${number}`)
+export function drawCard(number: number, deckId: string) : Promise<getCardsProps> {
+    return fetch(`${apiUrl}/${deckId}/draw/?count=${number}`)
         .then(response => response.json())
 }
 

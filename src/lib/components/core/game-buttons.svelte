@@ -1,20 +1,25 @@
 <script>
+	import { dealerStore } from "$lib/stores/dealer.store.svelte";
+	import { userStore } from "$lib/stores/player.store.svelte";
 	import Button from "../ui/button/button.svelte";
 
     const buttons = [
         {
             name: "hit",
-            onclick: () => { console.log("hit clicked") },
-            disabled: true
-        },
-        {
-            name: "stand",
-            onclick: () => { console.log("stand clicked") },
+            onclick: () => { 
+                userStore.hit();
+                console.log(userStore.hand)
+             },
             disabled: false
         },
         {
-            name: "double",
-            onclick: () => { console.log("double clicked") },
+            name: "stand",
+            onclick: () => { userStore.clearHand() },
+            disabled: false
+        },
+        {
+            name: "dealer hit",
+            onclick: () => { dealerStore.hit() },
             disabled: false
         },
         {

@@ -1,4 +1,6 @@
 import { browser } from '$app/environment';
+import { drawCard } from '$lib/api/routes';
+import { dealerStore } from './dealer.store.svelte';
 
 export type User = {
     name: string;
@@ -26,66 +28,89 @@ function getLocalUser(): User {
     return defaultUser;
 }
 
+function calculateHandValue(hand: User['hand']): number {
+    return hand.reduce((acc, card) => {
+        if (card.value === "ACE") {
+            return acc + 11;
+        }
+        if (card.value === "KING" || card.value === "QUEEN" || card.value === "JACK") {
+            return acc + 10;
+        }
+        return acc + parseInt(card.value);
+    }, 0);
+}
+
 function createUserStore() {
     let state = $state(getLocalUser());
+
+    function updateState(newState: Partial<User>) {
+        state = { ...state, ...newState };
+        if (browser) {
+            localStorage.setItem('user', JSON.stringify(state));
+        }
+    }
+
     return {
         get user() { return state },
         set user(value: User) { 
-            state = value;
-            if (browser) {
-                localStorage.setItem('user', JSON.stringify(value));
-            }
+            updateState(value);
         },
         get name() { return state.name },
         set name(value: string) { 
-            state.name = value;
-            if (browser) {
-                localStorage.setItem('user', JSON.stringify(state));
-            }
+            updateState({ name: value });
         },
         get balance() { return state.balance },
         set balance(value: number) { 
-            state.balance = value;
-            if (browser) {
-                localStorage.setItem('user', JSON.stringify(state));
-            }
+            updateState({ balance: value });
         },
         get hand() { return state.hand },
-        set hand(value) { 
-            state.hand = value;
-            state.handValue = value.reduce((acc, card) => {
-                if (card.value === "ACE") {
-                    return acc + 11;
-                }
-                if (card.value === "KING" || card.value === "QUEEN" || card.value === "JACK") {
-                    return acc + 10;
-                }
-                return acc + parseInt(card.value);
-            }
-            , 0);
-            if (browser) {
-                localStorage.setItem('user', JSON.stringify(state));
-            }
+        set hand(value: User['hand']) { 
+            updateState({ 
+                hand: value,
+                handValue: calculateHandValue(value)
+            });
         },
         get bet() { return state.bet },
         set bet(value: number) { 
-            state.bet = value;
-            if (browser) {
-                localStorage.setItem('user', JSON.stringify(state));
-            }
+            updateState({ bet: value });
         },
         get handValue() { return state.handValue },
         set handValue(value: number) { 
-            state.handValue = value;
-            if (browser) {
-                localStorage.setItem('user', JSON.stringify(state));
-            }
+            updateState({ handValue: value });
         },
         resetUser() { 
-            state = defaultUser;
-            if (browser) {
-                localStorage.setItem('user', JSON.stringify(defaultUser));
+            updateState(defaultUser);
+        },
+        hit() {
+            drawCard(1, dealerStore.deck_id).then(card => {
+                const newHand = [...state.hand, ...card.cards];
+                updateState({ 
+                    hand: newHand,
+                    handValue: calculateHandValue(newHand)
+                });
+            });
+        },
+        placeBet(amount: number) {
+            if (amount <= state.balance) {
+                updateState({
+                    bet: state.bet + amount,
+                    balance: state.balance - amount
+                });
+                return true;
             }
+            return false;
+        },
+        clearHand() {
+            updateState({
+                hand: [],
+                handValue: 0
+            });
+        },
+        resetBet() {
+            updateState({
+                bet: 0,
+                balance: state.balance + state.bet
+            });
         }
     }
 }
