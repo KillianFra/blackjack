@@ -7,10 +7,12 @@
 </script>
 <div>
     <h1 class="text-bold text-2xl text-center mb-4">Jack</h1>
-    <div class="flex items-center justify-center gap-4 pl-[calc(40px_+_1rem)]">
-        <div class="flex gap-4">
-            {#each userStore.hand as card}
-                <Card card={card}/>
+    <div class="flex items-center justify-center gap-12 pl-[calc(40px_+_1rem)]">
+        <div class="flex">
+            {#each userStore.hand as card, index}
+            <div class="w-16 h-42 bg-white/10 rounded-lg shadow-md flex justify-center items-center">
+                <Card card={card} {index}/>
+            </div>
             {/each}
         </div>
         {#if userStore.handValue > 0}

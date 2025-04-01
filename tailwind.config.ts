@@ -14,6 +14,9 @@ const config: Config = {
 			}
 		},
 		extend: {
+			dropShadow: {
+				'border': '0 1.2px 1.2px rgba(0,0,0,0.8)',
+			},
 			colors: {
 				border: "hsl(var(--border) / <alpha-value>)",
 				input: "hsl(var(--input) / <alpha-value>)",
@@ -55,7 +58,17 @@ const config: Config = {
 				sm: "calc(var(--radius) - 4px)"
 			},
 			fontFamily: {
-				sans: [...fontFamily.sans]
+				sans: ["Roboto Mono", ...fontFamily.mono],
+				serif: ["DM Serif Text", ...fontFamily.serif],
+				"serif-italic": ["DM Serif Text", ...fontFamily.serif],
+				"dm-serif": ["DM Serif Text", "serif"],
+				"dm-serif-italic": ["DM Serif Text", "serif"],
+			},
+			fontWeight: {
+				'normal': '400',
+			},
+			fontStyle: {
+				'italic': 'italic',
 			}
 		}
 	},

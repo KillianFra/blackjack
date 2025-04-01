@@ -17,7 +17,7 @@
     </div>
 </section>
 <section id="game-states" class="mb-4">
-    <div class="flex flex-col items-center gap-4">
+    <div class="flex flex-col items-center gap-4 mt-5">
         <GameButtons/>
         <BetCard/>
     </div>
