@@ -22,15 +22,13 @@ export const actions: Actions = {
       const { token, user } = await login(username, password);
       console.log('✅ Connexion réussie pour:', user);
 
-      cookies.set('auth_token', token, {
+      cookies.set('session', token, {
         httpOnly: true,
         secure: true,
         path: '/',
         maxAge: 3600, // 1h
       });
-
       console.log('🍪 Token stocké dans les cookies');
-      throw redirect(303, '/dashboard');
     } catch (error) {
       console.log('❌ Erreur de connexion:', error);
       return fail(401, { error: 'Identifiants incorrects' });

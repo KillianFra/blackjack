@@ -36,14 +36,15 @@ export async function register(registerData: RegisterRequest): Promise<LoginResp
 }
 
 // Connexion d'un utilisateur
-export async function login(email: string, password: string): Promise<LoginResponse> {
+export async function login(username: string, password: string): Promise<LoginResponse> {
   // Vérification de l'utilisateur dans Supabase
   const { data: userRecord, error: fetchError } = await supabase
     .from('users')
-    .select('*')
-    .eq('username', email)
-    .single();
-
+    .select()
+    .eq('username', username)
+    .limit(1)
+    .single()
+  console.log('User record:', userRecord);
   if (fetchError || !userRecord) {
     throw new Error('User not found');
   }
@@ -58,27 +59,9 @@ export async function login(email: string, password: string): Promise<LoginRespo
   const user: User = { id: userRecord.id.toString(), username: userRecord.username };
   const token = jwt.sign({ sub: user.id, username: user.username }, env.PUBLIC_SECRET_TOKEN, { expiresIn: '1h' });
 
-  // Créer une session pour cet utilisateur dans la table 'sessions'
-  const { error: sessionError } = await supabase
-    .from('sessions')
-    .insert([{ user_id: user.id, token, expires_at: new Date(Date.now() + 60 * 60 * 1000).toISOString() }]);
-
-  if (sessionError) {
-    throw new Error(sessionError.message);
-  }
-
   return { token, user };
 }
 
 // Déconnexion d'un utilisateur
 export async function logout(token: string): Promise<void> {
-  // Supprimer la session de la base de données Supabase
-  const { error: deleteError } = await supabase
-    .from('sessions')
-    .delete()
-    .eq('token', token);
-
-  if (deleteError) {
-    throw new Error(deleteError.message);
-  }
 }
