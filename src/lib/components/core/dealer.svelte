@@ -1,19 +1,24 @@
 <script>
-
-	import { dealerStore } from "$lib/stores/dealer.store.svelte";
-    import Card from "./card.svelte";
-
+	import { getHandValue } from '$lib/utils';
+	import Card from './card.svelte';
+	const { cards } = $props();
 </script>
+
 <div>
-    <h1 class="text-bold text-2xl text-center mb-4">Dealer</h1>
-    <div class="flex items-center justify-center gap-4 pl-[calc(40px_+_1rem)]">
-        <div class="flex gap-4">
-            {#each dealerStore.hand as card}
-                <Card card={card}/>
-            {/each}
-        </div>
-        {#if dealerStore.handValue > 0}
-            <div class="rounded-full p-4 bg-black/20 size-10 flex justify-center items-center font-bold">{dealerStore.handValue}</div>
-        {/if}
-    </div>
+	<h1 class="text-bold mb-4 text-center text-2xl">Dealer</h1>
+	<div class="flex items-center justify-center gap-4 pl-[calc(40px_+_1rem)]">
+		<div class="flex gap-4">
+			{#each cards as card}
+				<Card {card} />
+			{/each}
+			{#if cards.length === 1}
+				<Card back />
+			{/if}
+		</div>
+		{#if cards.length > 1}
+			<div class="flex size-10 items-center justify-center rounded-full bg-black/20 p-4 font-bold">
+				{getHandValue(cards)}
+			</div>
+		{/if}
+	</div>
 </div>
