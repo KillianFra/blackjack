@@ -1,9 +1,9 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { fail, redirect, RequestEvent } from '@sveltejs/kit';
 import { register } from '$lib/api/auth'; 
 import type { Actions } from './$types';
 
 export const actions: Actions = {
-  default: async ({ request, cookies }) => {
+  default: async ({ request, cookies }: RequestEvent) => {
     const formData = await request.formData();
     const username = formData.get('username') as string;
     const password = formData.get('password') as string;
