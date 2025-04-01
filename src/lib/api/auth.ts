@@ -2,12 +2,12 @@ import { supabase } from '../supabase';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import type { LoginRequest, LoginResponse, RegisterRequest, User } from '$lib/auth/types';
+import { env } from '$env/dynamic/public';
+import { error } from 'console';
 
-const JWT_SECRET = 'your_jwt_secret';
 
-
-export async function register(userData: RegisterRequest): Promise<LoginResponse> {
-  const { username, password, confirmPwd } = userData;
+export async function register(registerData: RegisterRequest): Promise<LoginResponse> {
+  const { username, password, confirmPwd } = registerData;
 
   if (password !== confirmPwd) {
     throw new Error('Passwords do not match');
@@ -20,18 +20,19 @@ export async function register(userData: RegisterRequest): Promise<LoginResponse
   const { data: user, error: insertError } = await supabase
     .from('users')
     .insert([{ username, password: hashedPassword }])
-    .select() // Ajoutez cette ligne pour récupérer les données insérées
+    .select()
     .single();
 
+    console.log('User registered:', user, error);
   if (insertError || !user) {
     console.error('Insertion error details:', insertError);
     throw new Error(insertError?.message || 'User insertion failed');
   }
 
-  // Création du token
-  const token = jwt.sign({ sub: user.id, username: user.username }, 'your_jwt_secret', { expiresIn: '1h' });
+  const userResponse: User = { id: user.id.toString(), username: user.username };
+  const token = jwt.sign({ sub: user.id, username: user.username }, env.PUBLIC_SECRET_TOKEN, { expiresIn: '1h' });
 
-  return { token, user };
+  return { token, user: userResponse };
 }
 
 // Connexion d'un utilisateur
@@ -55,7 +56,7 @@ export async function login(email: string, password: string): Promise<LoginRespo
   }
 
   const user: User = { id: userRecord.id.toString(), username: userRecord.username };
-  const token = jwt.sign({ sub: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
+  const token = jwt.sign({ sub: user.id, username: user.username }, env.PUBLIC_SECRET_TOKEN, { expiresIn: '1h' });
 
   // Créer une session pour cet utilisateur dans la table 'sessions'
   const { error: sessionError } = await supabase

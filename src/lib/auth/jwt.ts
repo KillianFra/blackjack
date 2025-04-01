@@ -1,6 +1,9 @@
 import { browser } from '$app/environment';
 import { jwtDecode } from 'jwt-decode';
-import type { JwtPayload } from './types';
+import type { JwtPayload, User } from './types';
+import jwt from 'jsonwebtoken';
+import type { User } from 'lucide-svelte';
+import { env } from '$env/dynamic/public';
 
 const TOKEN_KEY = 'auth_token';
 /**
@@ -58,24 +61,9 @@ export function removeStoredToken(): void {
   localStorage.removeItem(TOKEN_KEY);
 }
 
-/**
- * Check if a user has a specific role
- * @param roles User roles array
- * @param requiredRole The required role to check
- * @returns True if the user has the required role, false otherwise
- */
-export function hasRole(roles: string[] | undefined, requiredRole: string): boolean {
-  if (!roles || roles.length === 0) return false;
-  return roles.includes(requiredRole);
-}
-
-/**
- * Check if a user has any of the specified roles
- * @param roles User roles array
- * @param requiredRoles Array of roles to check against
- * @returns True if the user has any of the required roles, false otherwise
- */
-export function hasAnyRole(roles: string[] | undefined, requiredRoles: string[]): boolean {
-  if (!roles || roles.length === 0) return false;
-  return requiredRoles.some(role => roles.includes(role));
+export function verifyToken(token: string) {
+  console.log('tokennnnnn', token);
+  const user = jwt.verify(token, env.PUBLIC_SECRET_TOKEN);
+  console.log('user', user);
+  return user;
 }

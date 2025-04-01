@@ -1,12 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
-import dotenv from 'dotenv';
-dotenv.config();
+import { SUPABASE_URL, SUPABASE_KEY } from '$env/static/private';
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error("Supabase URL ou clé API manquante. Vérifie ton fichier .env");
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  throw new Error("Supabase URL or API key missing. Check your .env file");
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
