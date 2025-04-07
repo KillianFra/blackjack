@@ -18,15 +18,3 @@ export type Game = {
 	player: Player;
 	dealer: Player;
 };
-
-export enum GameState {
-	INIT,
-	BETTING,
-	DEALING,
-	HIT,
-	STAND,
-	DEALER_TURN,
-	EVALUATE,
-	RESULT,
-	GAME_OVER
-}

@@ -1,21 +1,30 @@
-import { type Card, GameState } from '$lib/types/players';
+import { type Card } from '$lib/types/players';
+import { getHandValue } from '$lib/utils';
+
+export enum GameState {
+	INIT,
+	PLAYING,
+	DEALER_TURN,
+	WIN,
+	LOSE,
+	BLACKJACK,
+	EQUAL
+}
 
 export class Game {
 	deckId: string = $state('');
-	gameState: GameState = GameState.INIT;
+	gameState: GameState = $state(GameState.INIT);
 	playerCards: Card[] = $state([]);
 	dealerCards: Card[] = $state([]);
 	playerBalance: number = $state(1000);
 	playerBet: number = $state(0);
 
 	constructor(deckId: string) {
-		console.log('deckId:', deckId);
 		this.deckId = deckId;
 	}
 
 	static async init(fetch: typeof globalThis.fetch) {
 		const deckId = await fetch('/api/deck').then((response) => response.json());
-		console.log('deckId:', deckId);
 		return deckId;
 	}
 
@@ -30,22 +39,100 @@ export class Game {
 	}
 
 	async bet(playerBet: number) {
-		console.log('bet:', playerBet);
-		this.gameState = GameState.BETTING;
+		if (playerBet <= this.playerBalance) {
+			this.playerBet = playerBet;
+			this.playerBalance -= playerBet;
+			this.gameState = GameState.PLAYING;
+		}
 	}
 
 	async deal() {
+		this.gameState = GameState.PLAYING;
 		const newDealerCards = await this.drawCards(1);
 		this.dealerCards = [...this.dealerCards, ...newDealerCards];
 		const newPlayerCards = await this.drawCards(2);
 		this.playerCards = [...this.playerCards, ...newPlayerCards];
+
+		// Vérifier le blackjack naturel
+		if (getHandValue(this.playerCards) === 21) {
+			this.evaluateBlackjack();
+		}
 	}
 
 	async hit() {
-		this.gameState = GameState.HIT;
+		const newPlayerCards = await this.drawCards(1);
+		this.playerCards = [...this.playerCards, ...newPlayerCards];
+
+		if (getHandValue(this.playerCards) > 21) {
+			this.evaluate();
+		}
 	}
 
-	stand() {
-		this.gameState = GameState.STAND;
+	async stand() {
+		while (
+			getHandValue(this.dealerCards) < 17 ||
+			getHandValue(this.playerCards) > getHandValue(this.dealerCards)
+		) {
+			const newDealerCard = await this.drawCards(1);
+			this.dealerCards = [...this.dealerCards, ...newDealerCard];
+		}
+
+		if (getHandValue(this.playerCards) < getHandValue(this.dealerCards)) {
+			this.evaluate();
+		}
+	}
+
+	private evaluateBlackjack() {
+		// Blackjack paie 3:2
+		this.playerBalance += this.playerBet * 2.5;
+		this.gameState = GameState.BLACKJACK;
+	}
+
+	private async evaluate() {
+		const playerValue = getHandValue(this.playerCards);
+		const dealerValue = getHandValue(this.dealerCards);
+
+		if (playerValue > 21) {
+			// Joueur perd (bust)
+			this.gameState = GameState.LOSE;
+		} else {
+			if (dealerValue > 21) {
+				// Dealer bust, joueur gagne
+				this.playerBalance += this.playerBet * 2;
+				this.gameState = GameState.WIN;
+				return;
+			} else if (playerValue > dealerValue) {
+				// Joueur gagne
+				this.playerBalance += this.playerBet * 2;
+				this.gameState = GameState.WIN;
+			} else if (playerValue === dealerValue) {
+				// Égalité (push)
+				this.playerBalance += this.playerBet;
+				this.gameState = GameState.EQUAL;
+			}
+		}
+
+		// Si aucune condition n'est remplie, le joueur perd (dealer gagne)
+		this.gameState = GameState.LOSE;
+		return;
+	}
+
+	resetHand() {
+		this.playerCards = [];
+		this.dealerCards = [];
+		this.playerBet = 0;
+		this.gameState = GameState.INIT;
+	}
+
+	canHit(): boolean {
+		return getHandValue(this.playerCards) < 21 && this.gameState !== GameState.BLACKJACK;
+	}
+
+	canStand(): boolean {
+		return this.playerCards.length >= 2 && this.gameState !== GameState.BLACKJACK;
+	}
+
+	canBet(): boolean {
+		return this.gameState === GameState.INIT && this.playerBalance > 0;
 	}
 }

@@ -2,7 +2,8 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { cubicOut } from 'svelte/easing';
 import type { TransitionConfig } from 'svelte/transition';
-import type { Card } from './types/players';
+import { type Card } from './types/players';
+import { GameState } from './engine/Game.svelte';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -58,12 +59,31 @@ export const flyAndScale = (
 
 export function getHandValue(cards: Card[]): number {
 	return cards.reduce((acc, current) => {
-		if (current.value === 'A') {
+		if (current.value === 'ACE') {
 			return acc + 11;
 		}
-		if (current.value === 'K' || current.value === 'Q' || current.value === 'J') {
+		if (current.value === 'KING' || current.value === 'QUEEN' || current.value === 'JACK') {
 			return acc + 10;
 		}
 		return acc + parseInt(current.value);
 	}, 0);
+}
+
+export function parseGameState(gameState: GameState): string {
+	switch (gameState) {
+		case GameState.INIT:
+			return 'Init';
+		case GameState.PLAYING:
+			return 'Playing';
+		case GameState.BLACKJACK:
+			return 'Blackjack';
+		case GameState.EQUAL:
+			return 'Equal';
+		case GameState.LOSE:
+			return 'Lose';
+		case GameState.WIN:
+			return 'Win';
+		default:
+			return 'Unknown';
+	}
 }

@@ -17,12 +17,6 @@
 			}
 		},
 		{
-			name: 'dealer hit',
-			onclick: () => {
-				game.dealerHit();
-			}
-		},
-		{
 			name: 'split',
 			onclick: () => {
 				game.split();
