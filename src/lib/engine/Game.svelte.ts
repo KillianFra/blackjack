@@ -4,7 +4,6 @@ import { getHandValue } from '$lib/utils';
 export enum GameState {
 	INIT,
 	PLAYING,
-	DEALER_TURN,
 	WIN,
 	LOSE,
 	BLACKJACK,
@@ -57,6 +56,11 @@ export class Game {
 		if (getHandValue(this.playerCards) === 21) {
 			this.evaluateBlackjack();
 		}
+	}
+
+	async replay() {
+		this.resetHand();
+		this.gameState = GameState.INIT;
 	}
 
 	async hit() {
