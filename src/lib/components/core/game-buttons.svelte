@@ -13,13 +13,13 @@
 		{
 			name: 'stand',
 			onclick: () => {
-				game.stand();
+				game.dealerPlay();
 			}
 		},
 		{
-			name: 'split',
+			name: 'double',
 			onclick: () => {
-				game.split();
+				game.doubleDown();
 			}
 		}
 	];
@@ -31,4 +31,9 @@
 			{button.name}
 		</Button>
 	{/each}
+	{#if game.canSplit()}
+		<Button class="w-[100px] bg-zinc-600 text-lg uppercase shadow-md" on:click={() => game.split()}>
+			Split
+		</Button>
+	{/if}
 </div>

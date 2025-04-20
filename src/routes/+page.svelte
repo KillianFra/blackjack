@@ -5,7 +5,6 @@
 	import Jack from '$lib/components/core/jack.svelte';
 	import ResetButton from '$lib/components/core/reset-button.svelte';
 	import { Game, GameState } from '$lib/engine/Game.svelte';
-	import { parseGameState } from '$lib/utils';
 	import type { PageProps } from './$types';
 
 	const { data }: PageProps = $props();

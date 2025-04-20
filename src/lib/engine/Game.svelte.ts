@@ -45,11 +45,22 @@ export class Game {
 		}
 	}
 
+	async doubleDown() {
+		if (this.playerBet === 0) return;
+		this.playerBalance -= this.playerBet;
+		this.playerBet *= 2;
+		this.dealerPlay();
+	}
+
 	async deal() {
+		if (this.playerBet === 0) return;
+
 		this.gameState = GameState.PLAYING;
-		const newDealerCards = await this.drawCards(1);
-		this.dealerCards = [...this.dealerCards, ...newDealerCards];
+		const newDealerCard = await this.drawCards(1);
+
+		this.dealerCards = [...this.dealerCards, ...newDealerCard];
 		const newPlayerCards = await this.drawCards(2);
+
 		this.playerCards = [...this.playerCards, ...newPlayerCards];
 
 		// Vérifier le blackjack naturel
@@ -72,7 +83,7 @@ export class Game {
 		}
 	}
 
-	async stand() {
+	async dealerPlay() {
 		while (
 			getHandValue(this.dealerCards) < 17 ||
 			getHandValue(this.playerCards) > getHandValue(this.dealerCards)
@@ -86,13 +97,23 @@ export class Game {
 		}
 	}
 
-	private evaluateBlackjack() {
+	private async evaluateBlackjack() {
+		// vérifier si le dealer a lui aussi un blackjack
+		const newDealerCard = await this.drawCards(1);
+		this.dealerCards = [...this.dealerCards, ...newDealerCard];
+		if (getHandValue(this.dealerCards) === 21) {
+			this.gameState = GameState.EQUAL;
+			return;
+		}
+
 		// Blackjack paie 3:2
 		this.playerBalance += this.playerBet * 2.5;
 		this.gameState = GameState.BLACKJACK;
 	}
 
 	private async evaluate() {
+		console.log('player bet:', this.playerBet);
+
 		const playerValue = getHandValue(this.playerCards);
 		const dealerValue = getHandValue(this.dealerCards);
 
@@ -103,11 +124,13 @@ export class Game {
 			if (dealerValue > 21) {
 				// Dealer bust, joueur gagne
 				this.playerBalance += this.playerBet * 2;
+				console.log('player balance:', this.playerBet);
 				this.gameState = GameState.WIN;
 				return;
 			} else if (playerValue > dealerValue) {
 				// Joueur gagne
 				this.playerBalance += this.playerBet * 2;
+				console.log('player balance:', this.playerBet);
 				this.gameState = GameState.WIN;
 			} else if (playerValue === dealerValue) {
 				// Égalité (push)
@@ -138,5 +161,9 @@ export class Game {
 
 	canBet(): boolean {
 		return this.gameState === GameState.INIT && this.playerBalance > 0;
+	}
+
+	canSplit(): boolean {
+		return this.playerCards.length === 2 && this.playerCards[0].value === this.playerCards[1].value;
 	}
 }

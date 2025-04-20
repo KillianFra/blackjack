@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { GameState } from '$lib/engine/Game.svelte';
 	import { Button } from '../ui/button';
 
 	const chips = [
@@ -17,12 +18,9 @@
 	}
 
 	function resetBet() {
+		if (game.gameState !== GameState.INIT) return;
 		game.playerBalance += game.playerBet;
 		game.playerBet = 0;
-	}
-
-	function handleDeal(bet: number) {
-		game.deal(bet);
 	}
 </script>
 
@@ -32,7 +30,7 @@
 			<p class="font-bold text-gray-500">BET</p>
 			<div class="flex">
 				<p class="text-left text-2xl">{game.playerBet}$</p>
-				{#if game.playerBet > 0}
+				{#if game.playerBet > 0 && game.gameState === GameState.INIT}
 					<button onclick={() => resetBet()} aria-label="reset-bet" class="text-md ml-2">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -62,7 +60,13 @@
 	</div>
 	{#if game.playerCards.length === 0}
 		<div class="flex flex-col items-end justify-between gap-4">
-			<Button class="text-md px-6" onclick={() => handleDeal(game.playerBet)}>DEAL</Button>
+			<Button
+				class="text-md px-6"
+				onclick={() => game.deal(game.playerBet)}
+				disabled={game.playerBet === 0}
+			>
+				DEAL
+			</Button>
 			<div class="flex gap-2">
 				{#each chips as chip}
 					<button

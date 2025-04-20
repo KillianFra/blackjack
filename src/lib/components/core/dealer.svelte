@@ -15,10 +15,12 @@
 				<Card back />
 			{/if}
 		</div>
-		{#if cards.length > 1}
-			<div class="flex size-10 items-center justify-center rounded-full bg-black/20 p-4 font-bold">
+		<div class="flex size-10 items-center justify-center rounded-full bg-black/20 p-4 font-bold">
+			{#if cards.length > 1}
 				{getHandValue(cards)}
-			</div>
-		{/if}
+			{:else}
+				?
+			{/if}
+		</div>
 	</div>
 </div>
