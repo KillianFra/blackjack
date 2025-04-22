@@ -62,7 +62,7 @@ importers:
         version: 2.1.1
       lucide-svelte:
         specifier: ^0.486.0
-        version: 0.486.0(svelte@5.25.3)
+        version: 0.486.0(svelte@5.25.5)
       prettier:
         specifier: ^3.4.2
         version: 3.5.3
@@ -2232,9 +2232,9 @@ snapshots:
 
   lru-cache@10.4.3: {}
 
-  lucide-svelte@0.486.0(svelte@5.25.3):
+  lucide-svelte@0.486.0(svelte@5.25.5):
     dependencies:
-      svelte: 5.25.3
+      svelte: 5.25.5
 
   magic-string@0.30.17:
     dependencies:
