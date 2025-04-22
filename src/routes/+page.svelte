@@ -11,7 +11,7 @@
 	const game = new Game(data.deckId);
 </script>
 
-<div class="container relative flex h-full w-full flex-col items-center justify-between text-white">
+<div class="container flex flex-col justify-center items-center pt-10 text-white max-h-screen overflow-y-hidden w-full">
 	<section id="header" class="mt-10">
 		{#if game.gameState === GameState.INIT}
 			<h3 class="text-center text-2xl font-bold">Start game</h3>
