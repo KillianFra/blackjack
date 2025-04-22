@@ -1,37 +1,62 @@
-
-
+import { redirect } from "@sveltejs/kit";
+import { jwtDecode } from "jwt-decode";
 
 export class User {
-    static async getUser() {
+    username: string;
+    id: string;
+    constructor(token: string) {
+        const user: { username: string; sub: string } = jwtDecode(token);
+        this.username = user.username;
+        this.id = user.sub
     }
 
-    static async login(username: string, password: string) {
-        const response = await fetch('/api/auth/login', {
+    // Setter for balance
+    async setBalance(newBalance: number, token: string) {
+        const user = await this.getUser(token)
+        await fetch('/api/u/balance',{
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password })
-        });
-        if (response.status === 401) {
-            return null;
-        } else if (response.status === 200) {
-            return response.json();
-        } else {
-            throw new Error('Failed to login');
+            body: JSON.stringify({token: `Bearer ${token}`, newBalance})
+        })
+    }
+
+    async getBalance(token: string): Promise<number | null> {
+        const user = await this.getUser(token)
+        return user?.balance
+    }
+
+
+    async getUser(token: string) {
+        const response = await fetch(`/api/auth/me`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(`Bearer ${token}`)
+        })
+
+        if (response.ok) {
+            return response.json()
         }
+        return null
     }
 
-    static async register(username: string, password: string, confirmPwd: string) {
-        const response = await fetch('/api/auth/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, password, confirmPwd })
-        });
-        if (response.status === 401) {
-            return null;
-        } else if (response.status === 200) {
-            return response.json();
-        } else {
-            throw new Error('Failed to register');
+    static async disconnect() {
+        try {
+            const response = await fetch('/api/auth/disconnect', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (!response.ok) {
+                console.error('Failed to disconnect:', response.statusText);
+                return false;
+            }
+            if (typeof localStorage !== 'undefined') {
+                localStorage.removeItem('token');
+            }
+        } catch (error) {
+            console.error('Error during disconnect:', error);
+            return false;
         }
     }
 }

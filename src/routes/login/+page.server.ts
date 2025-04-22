@@ -4,34 +4,42 @@ import type { Actions } from './$types';
 
 export const actions: Actions = {
   login: async ({ request, cookies }: RequestEvent) => {
-    console.log('🟢 Action login appelée');
-
     const formData = await request.formData();
     const username = formData.get('username') as string;
     const password = formData.get('password') as string;
-
-    console.log('📩 Form Data reçu:', { username, password });
-
     if (!username || !password) {
-      console.log('❌ Champs manquants');
       return fail(400, { error: 'Veuillez remplir tous les champs' });
     }
 
+    let loginResult;
     try {
-      console.log('🔍 Tentative de connexion pour:', username);
-      const { token, user } = await login(username, password);
-      console.log('✅ Connexion réussie pour:', user);
+      // Only wrap the part that might throw actual errors
+      loginResult = await login(username, password);
+    } catch (error) {
+      console.error('❌ Erreur de connexion:', error);
+      
+      return fail(401, { 
+        error: 'Identifiants incorrects',
+        username
+      });
+    }
 
-      cookies.set('session', token, {
+    // Process successful login outside the try/catch
+    if (loginResult?.token && loginResult?.user) {
+      cookies.set('session', loginResult.token, {
         httpOnly: true,
         secure: true,
         path: '/',
-        maxAge: 3600, // 1h
+        maxAge: 3600,
       });
-      console.log('🍪 Token stocké dans les cookies');
-    } catch (error) {
-      console.log('❌ Erreur de connexion:', error);
-      return fail(401, { error: 'Identifiants incorrects' });
+      
+      // This redirect won't be caught by your catch block
+      return redirect(303, '/');
+    } else {
+      return fail(401, { 
+        error: 'Identifiants incorrects ou erreur de serveur',
+        username
+      });
     }
   }
-};
+}
