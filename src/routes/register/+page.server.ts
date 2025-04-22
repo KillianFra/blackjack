@@ -33,7 +33,7 @@ export const actions: Actions = {
             console.error('Registration error:', error);
             return fail(500, { 
                 error: error.message || 'An error occurred during registration',
-                username // Return username to pre-fill the form
+                username
             });
         }
     }

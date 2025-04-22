@@ -112,8 +112,6 @@ export class Game {
 	}
 
 	private async evaluate() {
-		console.log('player bet:', this.playerBet);
-
 		const playerValue = getHandValue(this.playerCards);
 		const dealerValue = getHandValue(this.dealerCards);
 
@@ -124,13 +122,11 @@ export class Game {
 			if (dealerValue > 21) {
 				// Dealer bust, joueur gagne
 				this.playerBalance += this.playerBet * 2;
-				console.log('player balance:', this.playerBet);
 				this.gameState = GameState.WIN;
 				return;
 			} else if (playerValue > dealerValue) {
 				// Joueur gagne
 				this.playerBalance += this.playerBet * 2;
-				console.log('player balance:', this.playerBet);
 				this.gameState = GameState.WIN;
 			} else if (playerValue === dealerValue) {
 				// Égalité (push)
