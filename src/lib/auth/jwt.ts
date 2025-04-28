@@ -62,8 +62,6 @@ export function removeStoredToken(): void {
 }
 
 export function verifyToken(token: string) {
-  console.log('tokennnnnn', token);
   const user = jwt.verify(token, env.PUBLIC_SECRET_TOKEN);
-  console.log('user', user);
   return user;
 }

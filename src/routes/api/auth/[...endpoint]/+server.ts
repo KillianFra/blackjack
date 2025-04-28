@@ -3,15 +3,15 @@ import type { RequestHandler } from './$types';
 import { login, register, logout, getUserProfile } from '$lib/api/auth';
 
 export const POST: RequestHandler = async ({ request, params }) => {
-  console.log('===== DÉBUT POST REQUEST =====');
-  console.log('Endpoint:', params.endpoint);
-
   try {
     const body = await request.json();
     let response;
 
     if (params.endpoint === 'login') {
       response = await login(body.username, body.password);
+      if (!response) {
+        return json({ error: 'User Don\'t exist' }, { status: 401 });
+      }
     } else if (params.endpoint === 'register') {
       response = await register({
         username: body.username,
@@ -28,7 +28,6 @@ export const POST: RequestHandler = async ({ request, params }) => {
     }
 
     if (response) {
-      console.log('Réponse:', response);
       return json(response);
     }
 
@@ -40,9 +39,6 @@ export const POST: RequestHandler = async ({ request, params }) => {
 };
 
 export const GET: RequestHandler = async ({ request, params }) => {
-  console.log('===== DÉBUT GET REQUEST =====');
-  console.log('Endpoint:', params.endpoint);
-
   try {
     if (params.endpoint === 'me') {
       const token = request.headers.get('Authorization')?.replace('Bearer ', '');

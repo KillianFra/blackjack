@@ -1,6 +1,17 @@
 <script lang="ts">
 	import '../app.css';
-	let { children } = $props();
+	import Button from '$lib/components/ui/button/button.svelte';
+	import * as Popover from '$lib/components/ui/popover';
+	import {ChevronDown } from 'lucide-svelte';
+	import { User } from '$lib/engine/User.svelte';
+	import { redirect } from '@sveltejs/kit';
+	import { goto } from '$app/navigation';
+	let { children, data } = $props();
+
+	async function disconnect() {
+		await User.disconnect()
+		return goto('/login')
+	}
 </script>
 
 <main class="relative h-screen w-screen bg-emerald-950">
@@ -18,6 +29,21 @@
 						<span class="font-serif-italic font-semibold">inc.</span>
 					</a>
 				</div>
+				{#if data?.user}
+					<div class="flex items-center space-x-4 text-white">
+						<Popover.Root>
+							<Popover.Trigger class="hover:translate-y-[-2px] duration-200">
+								<div  class="flex gap-2 items-center">
+									Hello {data.user.username} 
+									<ChevronDown />
+								</div>
+							</Popover.Trigger>
+							<Popover.Content>
+								<Button variant="destructive" onclick={disconnect}>Disconnect</Button>
+							</Popover.Content>
+						  </Popover.Root>
+					</div>
+				{:else}
 				<div class="flex items-center space-x-4">
 					<a
 						href="/login"
@@ -30,6 +56,7 @@
 						>Register</a
 					>
 				</div>
+				{/if}
 			</div>
 		</div>
 	</nav>

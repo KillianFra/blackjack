@@ -20,8 +20,6 @@ export async function apiClient<T>(endpoint: string, options: ApiOptions = {}): 
   // Build URL with query parameters if needed
   let url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
 
-  console.log('Requête client vers:', url, 'Méthode:', options.method);
-  
   if (options.params) {
     const searchParams = new URLSearchParams();
     Object.entries(options.params).forEach(([key, value]) => {

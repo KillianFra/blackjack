@@ -6,6 +6,19 @@ import { env } from '$env/dynamic/public';
 import { error } from 'console';
 
 
+export async function me(token: string): Promise<User | null> {
+  if (!token) {
+    console.error('No token provided');
+    return null;
+  }
+  const { data: user, error: fetchError } = await supabase.auth.getUser(token);
+  if (fetchError) {
+    console.error('Fetch error:', fetchError);
+    return null;
+  }
+  return user.user ? { id: user.user.id, username: user.user.user_metadata.username } : null;
+}
+
 export async function register(registerData: RegisterRequest): Promise<LoginResponse> {
   const { username, password, confirmPwd } = registerData;
 
@@ -23,12 +36,10 @@ export async function register(registerData: RegisterRequest): Promise<LoginResp
     .select()
     .single();
 
-    console.log('User registered:', user, error);
   if (insertError || !user) {
     console.error('Insertion error details:', insertError);
     throw new Error(insertError?.message || 'User insertion failed');
   }
-
   const userResponse: User = { id: user.id.toString(), username: user.username };
   const token = jwt.sign({ sub: user.id, username: user.username }, env.PUBLIC_SECRET_TOKEN, { expiresIn: '1h' });
 
@@ -44,7 +55,6 @@ export async function login(username: string, password: string): Promise<LoginRe
     .eq('username', username)
     .limit(1)
     .single()
-  console.log('User record:', userRecord);
   if (fetchError || !userRecord) {
     throw new Error('User not found');
   }
