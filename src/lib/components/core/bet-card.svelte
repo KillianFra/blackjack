@@ -57,21 +57,21 @@
 			<p class="w-[100px] text-left text-2xl">{game.playerBalance}$</p>
 		</div>
 	</div>
-	<!-- {#if game.playerHands.length === 0} -->
-	<div class="flex flex-col items-end justify-between gap-4">
-		<Button class="text-md px-6" onclick={() => game.deal()} disabled={game.getTotalBet() === 0}>
-			DEAL
-		</Button>
-		<div class="flex gap-2">
-			{#each chips as chip}
-				<button
-					onclick={() => handleChipClick(chip.value)}
-					class="cursor-pointer transition-transform hover:scale-110"
-				>
-					<img src={chip.image} alt="{chip.value}$ chip" class="size-12" />
-				</button>
-			{/each}
+	{#if game.gameState === GameState.INIT}
+		<div class="flex flex-col items-end justify-between gap-4">
+			<Button class="text-md px-6" onclick={() => game.deal()} disabled={game.getTotalBet() === 0}>
+				DEAL
+			</Button>
+			<div class="flex gap-2">
+				{#each chips as chip}
+					<button
+						onclick={() => handleChipClick(chip.value)}
+						class="cursor-pointer transition-transform hover:scale-110"
+					>
+						<img src={chip.image} alt="{chip.value}$ chip" class="size-12" />
+					</button>
+				{/each}
+			</div>
 		</div>
-	</div>
-	<!-- {/if} -->
+	{/if}
 </div>

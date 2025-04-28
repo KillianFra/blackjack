@@ -36,5 +36,4 @@
 			<BetCard {game} />
 		</div>
 	</section>
-	{game.gameState}
 </div>
