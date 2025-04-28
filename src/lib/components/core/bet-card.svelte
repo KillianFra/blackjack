@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { GameState } from '$lib/engine/Game.svelte';
+	import { GameState, type Game } from '$lib/engine/Game.svelte';
 	import { Button } from '../ui/button';
 
 	const chips = [
@@ -10,17 +10,16 @@
 		{ value: 100, image: '/chips/chip-100.svg' }
 	];
 
-	const { game } = $props();
+	const { game }: { game: Game } = $props();
 
 	function handleChipClick(value: number) {
-		game.playerBet += value;
-		game.playerBalance -= value;
+		game.setBet(value);
 	}
 
 	function resetBet() {
 		if (game.gameState !== GameState.INIT) return;
-		game.playerBalance += game.playerBet;
-		game.playerBet = 0;
+		game.playerBalance += game.getTotalBet();
+		game.resetHands();
 	}
 </script>
 
@@ -29,8 +28,8 @@
 		<div class="flex flex-col">
 			<p class="font-bold text-gray-500">BET</p>
 			<div class="flex">
-				<p class="text-left text-2xl">{game.playerBet}$</p>
-				{#if game.playerBet > 0 && game.gameState === GameState.INIT}
+				<p class="text-left text-2xl">{game.getTotalBet()}$</p>
+				{#if game.getTotalBet() > 0 && game.gameState === GameState.INIT}
 					<button onclick={() => resetBet()} aria-label="reset-bet" class="text-md ml-2">
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -58,13 +57,9 @@
 			<p class="w-[100px] text-left text-2xl">{game.playerBalance}$</p>
 		</div>
 	</div>
-	{#if game.playerCards.length === 0}
+	{#if game.gameState === GameState.INIT}
 		<div class="flex flex-col items-end justify-between gap-4">
-			<Button
-				class="text-md px-6"
-				onclick={() => game.deal(game.playerBet)}
-				disabled={game.playerBet === 0}
-			>
+			<Button class="text-md px-6" onclick={() => game.deal()} disabled={game.getTotalBet() === 0}>
 				DEAL
 			</Button>
 			<div class="flex gap-2">

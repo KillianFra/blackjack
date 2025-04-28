@@ -10,6 +10,6 @@ export {
 	Content,
 	//
 	Root as Tooltip,
-	Trigger as TooltipTrigger,
 	Content as TooltipContent,
-}; 
+	Trigger as TooltipTrigger,
+};
