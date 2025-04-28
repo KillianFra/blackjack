@@ -68,9 +68,18 @@ export class Game {
 		}
 	}
 
-	doubleDown(hand: PlayerHand) {
+	async doubleDown(hand: PlayerHand) {
 		if (hand.bet === 0) return;
 		this.setBet(hand.bet, hand);
+
+		// draw one card
+		const newPlayerCard = await this.drawCards(1);
+		hand.cards = [...hand.cards, ...newPlayerCard];
+
+		// close the hand
+		hand.handState = HandState.STANDING;
+
+		this.checkDealerTurn();
 	}
 
 	replay() {
@@ -86,7 +95,8 @@ export class Game {
 		hand.cards = [...hand.cards, ...newPlayerCard];
 
 		if (getHandValue(hand.cards) > 21) {
-			this.evaluate(hand);
+			hand.handState = HandState.LOST;
+			this.dealerPlay();
 		}
 	}
 
@@ -119,12 +129,12 @@ export class Game {
 		this.dealerCards = [...this.dealerCards, ...newDealerCard];
 		const newPlayerCards = await this.drawCards(2);
 
-		// force twice the same card
-		while (newPlayerCards[0].value !== newPlayerCards[1].value) {
-			const newPlayerCard = await this.drawCards(1);
-			console.log('newPlayerCard:', newPlayerCard[0]);
-			newPlayerCards[1] = newPlayerCard[0];
-		}
+		// // force twice the same card
+		// while (newPlayerCards[0].value !== newPlayerCards[1].value) {
+		// 	const newPlayerCard = await this.drawCards(1);
+		// 	console.log('newPlayerCard:', newPlayerCard[0]);
+		// 	newPlayerCards[1] = newPlayerCard[0];
+		// }
 
 		// update first hands
 		this.playerHands[0].cards = newPlayerCards;
@@ -139,18 +149,35 @@ export class Game {
 	}
 
 	async dealerPlay() {
-		const maxHandValue = Math.max(...this.playerHands.map((hand) => getHandValue(hand.cards)));
+		// Get the maximum hand value among all player hands that haven't busted
+		const maxHandValue = Math.max(
+			...this.playerHands
+				.filter((hand) => getHandValue(hand.cards) <= 21)
+				.map((hand) => getHandValue(hand.cards))
+		);
 
-		while (getHandValue(this.dealerCards) < 17 || maxHandValue > getHandValue(this.dealerCards)) {
+		// If all players busted, no need for dealer to draw
+		if (maxHandValue > 21) {
+			const newDealerCard = await this.drawCards(1);
+			this.dealerCards = [...this.dealerCards, ...newDealerCard];
+
+			this.playerHands.forEach((hand) => {
+				hand.handState = HandState.LOST;
+			});
+			this.gameState = GameState.END;
+			return;
+		}
+
+		// Dealer draws until hand value is at least 17
+		while (getHandValue(this.dealerCards) < 17) {
 			const newDealerCard = await this.drawCards(1);
 			this.dealerCards = [...this.dealerCards, ...newDealerCard];
 		}
 
+		// Evaluate each hand against the dealer's final hand
 		this.playerHands.forEach((hand) => {
 			this.evaluate(hand);
 		});
-
-		console.log('this.playerHands:', this.playerHands);
 
 		this.gameState = GameState.END;
 	}
@@ -160,6 +187,10 @@ export class Game {
 			hand.handState = HandState.STANDING;
 		}
 
+		this.checkDealerTurn();
+	}
+
+	private checkDealerTurn() {
 		const handStates = this.playerHands.map((hand) => hand.handState);
 
 		if (!handStates.includes(HandState.PLAYING)) {
@@ -168,7 +199,7 @@ export class Game {
 	}
 
 	private async evaluateBlackjack(hand: PlayerHand) {
-		// vérifier si le dealer a lui aussi un blackjack
+		// vérifier si le dealer a lui
 		const newDealerCard = await this.drawCards(1);
 		this.dealerCards = [...this.dealerCards, ...newDealerCard];
 		if (getHandValue(this.dealerCards) === 21) {
@@ -187,26 +218,28 @@ export class Game {
 		const playerValue = getHandValue(hand.cards);
 		const dealerValue = getHandValue(this.dealerCards);
 
-		if (dealerValue > 21) {
-			// Dealer bust, joueur gagne
+		// Player busts
+		if (playerValue > 21) {
+			hand.handState = HandState.LOST;
+			return;
+		}
+
+		// Dealer busts or player has higher value
+		if (dealerValue > 21 || playerValue > dealerValue) {
 			this.playerBalance += hand.bet * 2;
 			hand.handState = HandState.WIN;
 			return;
-		} else if (playerValue > dealerValue) {
-			// Joueur gagne
-			this.playerBalance += hand.bet * 2;
-			hand.handState = HandState.WIN;
-			return;
-		} else if (playerValue === dealerValue) {
-			// Égalité (push)
+		}
+
+		// Equal values
+		if (playerValue === dealerValue) {
 			this.playerBalance += hand.bet;
 			hand.handState = HandState.EQUAL;
 			return;
 		}
 
-		// Si aucune condition n'est remplie, le joueur perd (dealer gagne)
+		// Dealer wins
 		hand.handState = HandState.LOST;
-		return;
 	}
 
 	getTotalBet() {
@@ -255,6 +288,14 @@ export class Game {
 	}
 
 	canDoubleDown(hand: PlayerHand): boolean {
-		return this.playerBalance >= hand.bet && hand.handState === HandState.PLAYING;
+		if (this.isSplited) {
+			return hand.cards.length === 1 && this.playerBalance >= hand.bet * 2;
+		}
+
+		return (
+			this.playerBalance >= hand.bet &&
+			hand.handState === HandState.PLAYING &&
+			hand.cards.length === 2
+		);
 	}
 }

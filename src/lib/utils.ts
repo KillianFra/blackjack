@@ -58,32 +58,30 @@ export const flyAndScale = (
 };
 
 export function getHandValue(cards: Card[]): number {
-	return cards.reduce((acc, current) => {
-		if (current.value === 'ACE') {
-			return acc + 11;
-		}
-		if (current.value === 'KING' || current.value === 'QUEEN' || current.value === 'JACK') {
-			return acc + 10;
-		}
-		return acc + parseInt(current.value);
-	}, 0);
-}
+	let value = 0;
+	let aces = 0;
 
-export function parseGameState(gameState: GameState): string {
-	switch (gameState) {
-		case GameState.INIT:
-			return 'Init';
-		case GameState.PLAYING:
-			return 'Playing';
-		case GameState.BLACKJACK:
-			return 'Blackjack';
-		case GameState.EQUAL:
-			return 'Equal';
-		case GameState.LOSE:
-			return 'Lose';
-		case GameState.WIN:
-			return 'Win';
-		default:
-			return 'Unknown';
+	// First pass: count all non-Ace cards and count Aces
+	cards.forEach((card) => {
+		if (card.value === 'ACE') {
+			aces += 1;
+		} else if (card.value === 'KING' || card.value === 'QUEEN' || card.value === 'JACK') {
+			value += 10;
+		} else {
+			value += parseInt(card.value);
+		}
+	});
+
+	// Second pass: add Aces as 11 or 1 depending on what's best
+	for (let i = 0; i < aces; i++) {
+		// If adding 11 would not bust, add 11
+		if (value + 11 <= 21) {
+			value += 11;
+		} else {
+			// Otherwise add 1
+			value += 1;
+		}
 	}
+
+	return value;
 }
