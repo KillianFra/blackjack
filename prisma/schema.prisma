@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String  @id @default(cuid())
+  username     String  @unique
+  password     String
+  balance      Int     @default(1000)
+  refreshToken String?
+  Game         Game[]
+}
+
+model Game {
+  id        String   @id @default(cuid())
+  userId    String
+  bet       Int
+  result    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
