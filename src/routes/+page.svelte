@@ -21,7 +21,7 @@
 
 	<section id="game">
 		{#if game.gameState !== GameState.INIT}
-			<div class="mb-4 flex flex-col gap-6">
+			<div class="mb-4 flex flex-col gap-10">
 				<Player cards={game.dealerCards} playerType="DEALER" />
 				<PlayerCards {game} />
 			</div>

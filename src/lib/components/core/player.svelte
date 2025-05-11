@@ -12,26 +12,28 @@
 </script>
 
 <div>
-	<h1 class="text-bold mb-4 text-center text-2xl">
-		{playerType === PlayerType.DEALER ? 'Dealer' : 'Jack'}
-	</h1>
-	<div class="flex items-center justify-center gap-12 pl-[calc(40px_+_1rem)]">
-		<div class="flex gap-4">
-			{#each cards as card, index}
-				<div class="h-42 flex w-16 items-center justify-center rounded-lg bg-white/10 shadow-md">
-					<CardComponent {card} {index} />
-				</div>
-			{/each}
-			{#if playerType === PlayerType.DEALER}
-				{#if cards.length === 1}
-					<CardComponent back />
-				{/if}
-			{/if}
-		</div>
+	<div class="relative mb-4 flex flex-row items-center justify-center gap-4">
+		<h1 class="text-bold text-2xl">
+			{playerType === PlayerType.DEALER ? 'Dealer' : 'Jack'}
+		</h1>
+
 		{#if cards.length > 0}
-			<div class="flex size-10 items-center justify-center rounded-full bg-black/20 p-4 font-bold">
+			<div
+				class="absolute right-0 flex size-10 items-center justify-center rounded-full bg-black/20 p-4 font-bold"
+			>
 				{getHandValue(cards)}
 			</div>
+		{/if}
+	</div>
+
+	<div class="flex pl-6">
+		{#each cards as card, index}
+			<CardComponent {card} {index} />
+		{/each}
+		{#if playerType === PlayerType.DEALER}
+			{#if cards.length === 1}
+				<CardComponent back />
+			{/if}
 		{/if}
 	</div>
 </div>
