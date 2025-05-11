@@ -47,6 +47,51 @@ export class Game {
 		return deckId;
 	}
 
+	async setBalance() {
+		const { balance } = await fetch('/api/user/balance').then((response) => response.json());
+
+		if (!balance) return;
+
+		this.playerBalance = balance;
+	}
+
+	async setGame() {
+		const game = await fetch('/api/game/load').then((response) => response.json());
+
+		if (!game) return;
+
+		this.deckId = game.deckId;
+		this.playerHands = game.playerHands;
+		this.dealerCards = game.dealerCards;
+		this.isSplited = game.isSplited;
+		this.gameState = game.gameState;
+	}
+
+	async saveState() {
+		const gameData = {
+			bet: this.getTotalBet(),
+			deckId: this.deckId,
+			playerHands: this.playerHands,
+			dealerCards: this.dealerCards,
+			gameState: this.gameState,
+			playerBalance: this.playerBalance,
+			isSplited: this.isSplited,
+			isDone: this.gameState === GameState.END
+		};
+
+		const response = await fetch('/api/game/save', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(gameData)
+		});
+
+		if (!response.ok) {
+			throw new Error('Failed to save game state');
+		}
+
+		return response.json();
+	}
+
 	private async drawCards(count: number) {
 		try {
 			return await fetch(`/api/card?deckId=${this.deckId}&drawCount=${count}`).then((response) =>
@@ -65,6 +110,7 @@ export class Game {
 				this.playerHands[0].bet += bet;
 			}
 			this.playerBalance -= bet;
+			this.saveState();
 		}
 	}
 
@@ -80,6 +126,7 @@ export class Game {
 		hand.handState = HandState.STANDING;
 
 		this.checkDealerTurn();
+		await this.saveState();
 	}
 
 	replay() {
@@ -98,6 +145,7 @@ export class Game {
 			hand.handState = HandState.LOST;
 			this.dealerPlay();
 		}
+		await this.saveState();
 	}
 
 	async split() {
@@ -146,6 +194,7 @@ export class Game {
 				this.evaluateBlackjack(hand);
 			}
 		});
+		await this.saveState();
 	}
 
 	async dealerPlay() {
@@ -165,6 +214,7 @@ export class Game {
 				hand.handState = HandState.LOST;
 			});
 			this.gameState = GameState.END;
+			await this.saveState();
 			return;
 		}
 
@@ -180,6 +230,7 @@ export class Game {
 		});
 
 		this.gameState = GameState.END;
+		await this.saveState();
 	}
 
 	stand(hand: PlayerHand) {
@@ -205,6 +256,7 @@ export class Game {
 		if (getHandValue(this.dealerCards) === 21) {
 			hand.handState = HandState.EQUAL;
 			this.gameState = GameState.END;
+			await this.saveState();
 			return;
 		}
 
@@ -212,9 +264,10 @@ export class Game {
 		this.playerBalance += hand.bet * 2.5;
 		hand.handState = HandState.BLACKJACK;
 		this.gameState = GameState.END;
+		await this.saveState();
 	}
 
-	private evaluate(hand: PlayerHand) {
+	private async evaluate(hand: PlayerHand) {
 		const playerValue = getHandValue(hand.cards);
 		const dealerValue = getHandValue(this.dealerCards);
 
@@ -240,6 +293,7 @@ export class Game {
 
 		// Dealer wins
 		hand.handState = HandState.LOST;
+		await this.saveState();
 	}
 
 	getTotalBet() {

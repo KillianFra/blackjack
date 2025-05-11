@@ -18,10 +18,24 @@ model User {
 }
 
 model Game {
-  id        String   @id @default(cuid())
-  userId    String
-  bet       Int
-  result    String
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+  id            String    @id @default(cuid())
+  userId        String
+  bet           Int
+  isDone        Boolean   @default(false)
+  deckId        String
+  playerHands   Json
+  dealerCards   Json
+  gameState     GameState
+  playerBalance Int
+  isSplited     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  user          User      @relation(fields: [userId], references: [id])
+}
+
+enum GameState {
+  INIT
+  PLAYING
+  DEALER_TURN
+  END
 }

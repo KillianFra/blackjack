@@ -10,6 +10,11 @@
 
 	const { data }: PageProps = $props();
 	const game = new Game(data.deckId);
+
+	$effect(() => {
+		game.setGame();
+		game.setBalance();
+	});
 </script>
 
 <div
@@ -21,7 +26,7 @@
 
 	<section id="game">
 		{#if game.gameState !== GameState.INIT}
-			<div class="mb-4 flex flex-col gap-6">
+			<div class="mb-4 flex flex-col gap-10">
 				<Player cards={game.dealerCards} playerType="DEALER" />
 				<PlayerCards {game} />
 			</div>
