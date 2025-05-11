@@ -10,6 +10,11 @@
 
 	const { data }: PageProps = $props();
 	const game = new Game(data.deckId);
+
+	$effect(() => {
+		game.setGame();
+		game.setBalance();
+	});
 </script>
 
 <div

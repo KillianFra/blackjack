@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import type { LoginRequest, LoginResponse, RegisterRequest, User } from '$lib/auth/types';
+import type { LoginResponse, RegisterRequest, User } from '$lib/auth/types';
 import { env } from '$env/dynamic/public';
 import prisma from '$lib/prisma';
 import { createApiError, ErrorCodes } from '$lib/utils/error-handler';
@@ -88,4 +88,11 @@ export async function login(username: string, password: string): Promise<LoginRe
 export async function logout(token: string): Promise<void> {
 	// Token invalidation would happen here if using a token blacklist
 	// For client-side auth, we simply remove the cookie on the client side
+}
+
+export async function getUser(id: string): Promise<User | null> {
+	const user = await prisma.user.findUnique({
+		where: { id }
+	});
+	return user ? { id: user.id.toString(), username: user.username } : null;
 }
