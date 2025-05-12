@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { GameState, type Game } from '$lib/engine/Game.svelte';
-	import { Button } from '../ui/button';
+	import { Plus } from 'lucide-svelte';
+	import { Button } from '$lib/components/ui/button';
 
 	const chips = [
 		{ value: 1, image: '/chips/chip-1.svg' },

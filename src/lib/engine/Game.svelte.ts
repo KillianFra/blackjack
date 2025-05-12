@@ -110,7 +110,6 @@ export class Game {
 				this.playerHands[0].bet += bet;
 			}
 			this.playerBalance -= bet;
-			this.saveState();
 		}
 	}
 

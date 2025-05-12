@@ -17,3 +17,20 @@ export async function GET({ locals }) {
 
 	return json(user);
 }
+
+export async function POST({ locals, request }) {
+	if (!locals.user) {
+		return json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
+	const { balance } = await request.json();
+
+	const user = await prisma.user.update({
+		where: {
+			id: locals.user.id
+		},
+		data: { balance }
+	});
+
+	return json(user);
+}

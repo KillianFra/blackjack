@@ -5,4 +5,4 @@
 	const { game }: { game: Game } = $props();
 </script>
 
-<Button on:click={() => game.replay()}>Rejouer</Button>
+<Button on:click={() => game.replay()}>Replay</Button>
