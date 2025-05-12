@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { login, register, logout, getUser } from '$lib/api/auth';
+import { login, register, logout, getUser } from '$lib/services/auth';
 import { verifyToken } from '$lib/auth/jwt';
 
 export const POST: RequestHandler = async ({ request, params }) => {

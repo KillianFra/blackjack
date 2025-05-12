@@ -1,5 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { register } from '$lib/api/auth';
+import { register } from '$lib/services/auth';
 import type { Actions } from './$types';
 import type { RegisterFormData } from '$lib/types/types';
 import { ErrorCodes, ErrorMessages } from '$lib/utils/error-handler';
