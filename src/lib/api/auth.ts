@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import type { LoginResponse, RegisterRequest, User } from '$lib/auth/types';
+import type { LoginResponse, RegisterRequest, User } from '$lib/types/types';
 import { env } from '$env/dynamic/public';
 import prisma from '$lib/prisma';
 import { createApiError, ErrorCodes } from '$lib/utils/error-handler';

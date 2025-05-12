@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Input } from '$lib/components/ui/input';
 	import FormError from '$lib/components/ui/form-error.svelte';
-	import type { LoginFormData } from '$lib/auth/types';
+	import type { LoginFormData } from '$lib/types/types';
 	import Logo from '$lib/components/core/logo.svelte';
 	export let form: LoginFormData | null = null;
 </script>

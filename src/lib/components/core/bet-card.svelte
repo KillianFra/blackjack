@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { GameState, type Game } from '$lib/engine/Game.svelte';
-	import { Button } from '../ui/button';
+	import { Button } from '$lib/components/ui/button';
 
 	const chips = [
 		{ value: 1, image: '/chips/chip-1.svg' },
@@ -54,7 +54,9 @@
 		</div>
 		<div>
 			<p class="font-bold text-gray-500">BALANCE</p>
-			<p class="w-[100px] text-left text-2xl">{game.playerBalance}$</p>
+			<div class="flex items-center justify-center gap-2">
+				<p class="text-left text-2xl">{game.playerBalance}$</p>
+			</div>
 		</div>
 	</div>
 	{#if game.gameState === GameState.INIT}

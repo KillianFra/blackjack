@@ -1,6 +1,6 @@
 import { error, type Handle } from '@sveltejs/kit';
 import prisma from '$lib/prisma';
-import { verifyToken } from '$lib/auth/jwt';
+import { verifyToken } from '$lib/utils/jwt';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const token = event.cookies.get('session');
@@ -20,6 +20,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 		});
 
 		if (!user) {
+			// remove the session cookie
+			event.cookies.delete('session', { path: '/' });
 			throw error(401, 'User not found');
 		}
 
