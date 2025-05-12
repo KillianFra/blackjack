@@ -4,10 +4,11 @@
 	import * as Popover from '$lib/components/ui/popover';
 	import { ChevronDown } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
+	import { User } from '$lib/engine/User.svelte';
 	let { children, data } = $props();
 
 	async function disconnect() {
-		await disconnect();
+		await User.disconnect();
 		return goto('/login');
 	}
 </script>
@@ -37,7 +38,10 @@
 								</div>
 							</Popover.Trigger>
 							<Popover.Content>
-								<Button variant="destructive" onclick={disconnect}>Disconnect</Button>
+								<div class="flex flex-col gap-2">
+									<a class="cursor-pointer underline hover:opacity-80" href="/games">Last games</a>
+									<Button variant="destructive" onclick={disconnect}>Disconnect</Button>
+								</div>
 							</Popover.Content>
 						</Popover.Root>
 					</div>

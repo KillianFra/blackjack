@@ -1,5 +1,5 @@
 import { type Card } from '$lib/types/players';
-import { getHandValue } from '$lib/utils/utils';
+import { getHandValue } from '$lib/utils';
 
 export enum GameState {
 	INIT = 'INIT',
