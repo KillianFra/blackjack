@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getHandValue } from '$lib/utils/utils';
+	import { getHandValue } from '$lib/utils';
 	import { type Card } from '$lib/types/players';
 	import CardComponent from './card.svelte';
 	const { cards, playerType }: { cards: Card[]; playerType: PlayerType } = $props();
