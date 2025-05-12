@@ -2,7 +2,7 @@ import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { cubicOut } from 'svelte/easing';
 import type { TransitionConfig } from 'svelte/transition';
-import { type Card } from './types/players';
+import type { Card } from '$lib/types/players';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));

@@ -1,7 +1,7 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { register } from '$lib/api/auth';
 import type { Actions } from './$types';
-import type { RegisterFormData } from '$lib/auth/types';
+import type { RegisterFormData } from '$lib/types/types';
 import { ErrorCodes, ErrorMessages } from '$lib/utils/error-handler';
 
 export const actions: Actions = {

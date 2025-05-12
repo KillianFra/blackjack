@@ -3,12 +3,11 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as Popover from '$lib/components/ui/popover';
 	import { ChevronDown } from 'lucide-svelte';
-	import { User } from '$lib/engine/User.svelte';
 	import { goto } from '$app/navigation';
 	let { children, data } = $props();
 
 	async function disconnect() {
-		await User.disconnect();
+		await disconnect();
 		return goto('/login');
 	}
 </script>

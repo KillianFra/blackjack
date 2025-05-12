@@ -1,4 +1,3 @@
-import { redirect } from '@sveltejs/kit';
 import { jwtDecode } from 'jwt-decode';
 
 export class User {
@@ -11,36 +10,12 @@ export class User {
 	}
 
 	// Setter for balance
-	async setBalance(newBalance: number, token: string) {
-		const user = await this.getUser(token);
-
-		if (!user) {
-			throw new Error('User not found');
-		}
-
+	static async setBalance(newBalance: number) {
 		await fetch('/api/user/balance', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ token: `Bearer ${token}`, newBalance })
+			body: JSON.stringify({ newBalance })
 		});
-	}
-
-	async getBalance(token: string): Promise<number | null> {
-		const user = await this.getUser(token);
-		return user?.balance;
-	}
-
-	async getUser(token: string) {
-		const response = await fetch(`/api/auth/me`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(`Bearer ${token}`)
-		});
-
-		if (response.ok) {
-			return response.json();
-		}
-		return null;
 	}
 
 	static async disconnect() {

@@ -1,5 +1,5 @@
 import { type Card } from '$lib/types/players';
-import { getHandValue } from '$lib/utils';
+import { getHandValue } from '$lib/utils/utils';
 
 export enum GameState {
 	INIT = 'INIT',
@@ -47,7 +47,7 @@ export class Game {
 		return deckId;
 	}
 
-	async setBalance() {
+	async setGameBalance() {
 		const { balance } = await fetch('/api/user/balance').then((response) => response.json());
 
 		if (!balance) return;

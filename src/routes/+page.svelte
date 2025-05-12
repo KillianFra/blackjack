@@ -13,7 +13,7 @@
 
 	$effect(() => {
 		game.setGame();
-		game.setBalance();
+		game.setGameBalance();
 	});
 </script>
 

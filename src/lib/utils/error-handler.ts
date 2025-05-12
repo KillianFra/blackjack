@@ -1,7 +1,7 @@
 /**
  * Error handling utilities for the application
  */
-import type { ErrorResponse } from '$lib/auth/types';
+import type { ErrorResponse } from '$lib/types/types';
 
 /**
  * Standardized error response format
