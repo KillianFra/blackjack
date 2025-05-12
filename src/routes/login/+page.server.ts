@@ -1,5 +1,5 @@
 import { fail, redirect, type RequestEvent } from '@sveltejs/kit';
-import { login } from '$lib/api/auth';
+import { login } from '$lib/services/auth';
 import type { Actions } from './$types';
 import { ErrorCodes, ErrorMessages } from '$lib/utils/error-handler';
 
