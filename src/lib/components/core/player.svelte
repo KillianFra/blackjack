@@ -18,15 +18,13 @@
 		</h1>
 
 		{#if cards.length > 0}
-			<div
-				class="absolute right-0 flex size-10 items-center justify-center rounded-full bg-black/20 p-4 font-bold"
-			>
+			<div class="flex size-10 items-center justify-center rounded-full bg-black/20 p-4 font-bold">
 				{getHandValue(cards)}
 			</div>
 		{/if}
 	</div>
 
-	<div class="flex pl-6">
+	<div class="flex justify-center pl-6">
 		{#each cards as card, index}
 			<CardComponent {card} {index} />
 		{/each}
